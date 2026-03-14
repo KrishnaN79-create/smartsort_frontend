@@ -8,7 +8,7 @@
     margin-top: 25px;
     margin-left: 50px;
     align-items: center;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
     background-color: #35D0BA;
     color: #1F7D53;
 }
@@ -24,7 +24,7 @@
     margin-top: 25px;
     margin-left: 50px;
     align-items: center;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 .file-overlay{
     background-color: #35D0BA;
@@ -41,7 +41,7 @@
     display: inline-block;
     vertical-align: top;
     border-radius: 10px;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 .compost{
     background-color: #35D0BA;
@@ -55,28 +55,28 @@
     margin-top: 25px;
     margin-left: 50px;
     align-items: center;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 img {
     width: 100px;
     height: 100px;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 body {
     text-align: center;
     color: #FFFCFB;
     font-size: 17px;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 html {
     background-color: #086972;  
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
     display: grid;
     align-items: center;
 }
 h1 {
     color: #FFFCFB; 
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
     display: block;
     margin-bottom: 10px;
     margin-top: 0;
@@ -95,10 +95,10 @@ h1 {
     margin-top: 35px;
     vertical-align: top;
     text-align: center;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
     p {
         color: #1F7D53;
-        font-family: "Playwrite NZ Guides", cursive;
+        font-family: "Times New Roman", Times, serif;
     }
 }
 .photo { 
@@ -114,7 +114,7 @@ h1 {
     text-align: center;
     vertical-align: top;
     align-items: center;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 
 .photo video {
@@ -126,7 +126,7 @@ h1 {
     background-size: 100% 100%; 
     display: block;
     margin: 0.4rem auto;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 .photo img#photoPreview {
     display: block;
@@ -134,14 +134,14 @@ h1 {
     max-width: 50%;
     margin: 0.4rem auto 0;
     border-radius: 6px;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 .photo-controls {
     display: flex;
     gap: 0.4rem;
     justify-content: center;
     margin-top: 0.3rem;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 .photo-controls button {
     padding: 0.35rem 0.6rem;
@@ -149,7 +149,7 @@ h1 {
     border: none;
     margin-bottom: 10px;
     cursor: pointer;
-    font-family: "Playwrite NZ Guides", cursive;
+    font-family: "Times New Roman", Times, serif;
 }
 .mainWebsite {
     display: grid;
@@ -167,5 +167,5 @@ h1 {
 }
 .output {
     color: #FFFCFB;
-        font-family: "Playwrite NZ Guides", cursive;
+        font-family: "Times New Roman", Times, serif;
 }
