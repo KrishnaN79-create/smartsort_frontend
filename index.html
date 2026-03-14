@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sort</title>
+</head>
+
+<body class="Smart Sort">
+
+    <script type="module">
+        const startBtn = document.getElementById('startCamera'); // Element for start camera button
+        const stopBtn = document.getElementById('stopCamera'); // Element for stop camera button
+        const captureBtn = document.getElementById('capture'); // Element for capture photo button  
+        const video = document.getElementById('video'); // Video element to display camera stream
+        const canvas = document.getElementById('canvas'); // Canvas element for capturing photos
+        const photoPreview = document.getElementById('photoPreview'); //Element to show captured photo
+        let stream = null; //Media Stream object
+
+        // Function to start the camera, show the video stream, and show error if permission not granted
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                startBtn.disabled = true;
+                captureBtn.disabled = false;
+                stopBtn.disabled = false;
+            } catch (err) {
+                console.error('getUserMedia error:', err);
+                alert('Could not access camera: ' + (err && err.message));
+            }
+        }
+
+        // Function to stop the camera and release the video stream
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+            startBtn.disabled = false;
+            captureBtn.disabled = true;
+            stopBtn.disabled = true;
+        }
+        // Function to capture the photo and display it in the photo preview element
+        function capturePhoto() {
+            const w = video.videoWidth;
+            const h = video.videoHeight;
+            if (!w || !h) return;
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/png');
+            photoPreview.src = dataUrl;
+            photoPreview.style.display = 'block';
+        };
+
+        startBtn && startBtn.addEventListener('click', startCamera); // When clicked, it will start the camera
+        stopBtn && stopBtn.addEventListener('click', stopCamera); // When clicked, it will stop the camera
+        captureBtn && captureBtn.addEventListener('click', capturePhoto); // When clicked, it will capture a photo
+
+        // Function to convert the file to a generative part as it is a requirement forr the API
+        function fileToGenerativePart(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64Data = reader.result.split(",")[1];
+                    resolve({
+                        inlineData: {
+                            mimeType: file.type,
+                            data: base64Data,
+                         },
+                    });
+                };
+                reader.onerror = (err) => reject(err);
+                reader.readAsDataURL(file);
+            });
+        }
+        // Generates content using the API based on the text input
+        async function generateContent() {
+            const imageInput = document.getElementById("textInput");
+            const outputElement = document.getElementById("output");
+            const submitText = document.getElementById("submitText");
+
+            var imagePart = null;
+
+            submitText.disabled = true;
+            outputElement.innerText = "Analyzing ...";
+
+            imagePart = document.getElementById("textInput").value;
+
+
+/*            const GEMINI_API_KEY = "AIzaSyAXSuTF-EAz6dGFSWOQzyH4xMWcNULeNXE"
+            const url =
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+            console.log(imagePart)
+      */      
+     
+      
+ const RENDER_URL = "https://smartsort-backend-3llh.onrender.com/gemini";
+
+    const requestBody = {
+        prompt: `Tell me if this image (if provided) or text=${imagePart} represents an object that is recyclable, compostable, or trash in one word`
+    };
+
+    try {
+        const response = await fetch(RENDER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            const errorDetail = await response.json().catch(() => ({}));
+            throw new Error(
+                `HTTP error! Status: ${response.status}. Details: ${JSON.stringify(errorDetail)}`
+            );
+        }
+
+        const data = await response.json();
+        console.log(data);
+
+        const text = data.candidates[0].content.parts[0].text;
+        outputElement.innerText = text;
+
+    } catch (error) {
+        console.error("Fetch Error:", error.message);
+        outputElement.innerText = `Error: ${error.message}`;
+    } finally {
+        submitText.disabled = false;
+    }
+
+        }
+        // Generates content using the API based on the file input
+        async function generateContentImage() {
+            const imageInput = document.getElementById("imageInput");
+            const outputElement = document.getElementById("output");
+            const submitButton = document.getElementById("submitButton");
+
+            var imagePart = null;
+            // If the file input is empty, it will display an image to add the file
+            if (imageInput.files.length === 0) {
+                outputElement.innerText = "Please give an image.";
+                return;
+            }
+
+            submitButton.disabled = true;
+            outputElement.innerText = "Analyzing ...";
+
+            const imageFile = imageInput.files[0];
+            imagePart = await fileToGenerativePart(imageFile);
+
+            const GEMINI_API_KEY = "AIzaSyAXSuTF-EAz6dGFSWOQzyH4xMWcNULeNXE"
+            const url =
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+            console.log(imagePart)
+            const requestBody = {
+                contents: [
+                    {
+                        parts: [
+                            {
+                                text: `Tell me if this image represents an object that is recycable, compostable, or trash in one word`,
+                            },
+                            imagePart,
+                        ],
+                    },
+                ],
+            };
+            // This gives the API the request that is given
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "x-goog-api-key": GEMINI_API_KEY,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+                // This checks whether the response that has been given is ok, and if not, it will throw out an error message
+                if (!response.ok) {
+                    const errorDetail = await response.json().catch(() => ({}))
+                    throw new Error(
+                        `HTTP error! Status: ${response.Status
+                        }. Details: ${JSON.stringify(errorDetail)}`
+                    );
+                }
+
+                const data = await response.json(); // This creates the response given, into JSON format
+                console.log(data); // This displays the data in the console
+                const text = data.candidates[0].content.parts[0].text // This recieves the text from the response
+                outputElement.innerText = text; // This displays the text(output) on the webpage
+            } 
+            // This finds whether there were any errors during the process and tell the user the message
+            catch (error) {
+                console.error("Fetch Error:", error.message);
+                outputElement.innerText = `Error: ${error.message}`;
+            } 
+            // This re-enables the submit button when finished
+            finally {
+                submitButton.disabled = false;
+
+            }
+        }
+        // Generates content using the API based on the photo input
+        async function generateContentPhoto() {
+            const photoInput = document.getElementById("photoPreview");
+            const outputElement = document.getElementById("output");
+            const submitPhoto = document.getElementById("submitPhoto");
+            var photoPart = null;
+
+
+            console.log(photoInput.src)
+
+            submitPhoto.disabled = true;
+            outputElement.innerText = "Analyzing ...";
+
+            photoPart = photoInput.src
+
+            const GEMINI_API_KEY = "AIzaSyAXSuTF-EAz6dGFSWOQzyH4xMWcNULeNXE"
+            const url =
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+            const requestBody = {
+                contents: [
+                    {
+                        parts: [
+                            {
+                                text: `Tell me if this photo represents an object that is recycable, compostable, or trash in one word`,
+                            },
+                            {
+                                inlineData: {
+                                    mimeType: "image/png",
+                                    data: photoPart.split(",")[1],
+                                },
+                            },
+                        ],
+                    },
+                ],
+            };
+            // This gives the API the request that has been given
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "x-goog-api-key": GEMINI_API_KEY,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+
+                const data = await response.json();
+                console.log(data);
+                const text = data.candidates[0].content.parts[0].text
+                outputElement.innerText = text;
+            } 
+            // Find whether there wre any errors and display the message to the user
+            catch (error) {
+                console.error("Fetch Error:", error.message);
+                outputElement.innerText = `Error: ${error.message}`;
+            } 
+            // Re-enables the submit button when completed
+            finally {
+                submitPhoto.disabled = false;
+            }
+        }
+        submitPhoto.addEventListener("click", generateContentPhoto); // When clicked, it will generate content based on the photo input
+        submitText.addEventListener("click", generateContent); // When clicked, it will generate content based on the text input
+        submitButton.addEventListener("click", generateContentImage); // When clicked, it will generate content based on the file input
+
+    </script>
+    <div class="mainWebsite"> <!--Contains the main content of the website-->
+        <div class="sidebar"> <!--Contains information about waste categories-->
+            <section class="trash"> <!--Contains information about trash category-->
+                <img
+                    src="https://images.vexels.com/media/users/3/223479/isolated/preview/8ecc75c9d0cf6d942cce96e196d4953f-trash-bin-icon-flat.png">
+                <h2>Trash</h2>
+                <p>For items that cannot be recycled or composted.</p>
+            </section>
+
+            <section class="recycle"> <!--Contains information about recycle category-->
+                <img src="https://media.silhouettedesignstore.com/media/catalog/product/cache/07724bc829ac4d331e977e053f440786/c/u/cute_recycle_heart_colored.png">
+                <h2>Recycle</h2>
+                <p>For materials like paper, plastic, glass, and metal.</p>
+            </section>
+
+            <section class="compost"> <!--Contains information about compost category-->
+                <img src="https://cdn-icons-png.flaticon.com/512/18007/18007531.png">
+                <h2>Compost</h2>
+                <p>For organic waste like food scraps and yard trimmings.</p>
+            </section>
+        </div>
+        <div class="main"> <!--Contains the main interactive section of the website-->
+            <h1 class="title">Smart Sort</h1>
+            <p>Please type, take a photo, or upload a file of the item you are willing to throw away.</p>
+            <p>Once you enter the item, this website will figure out whether this item is trash, recycle, or compost.</p>
+            <h1 id="output" class="output">Please type, take a photo, or upload an image to get the result.</h1>
+            <div class="input-section"> <!--Contains the input methods for the user to provide data to be analyzed-->
+                <div class="text overlay"> <!--Contains the text input method-->
+                    <h1>Please Type</h1>
+                    <p>Please type in the item you would like to dispose.</p>
+                    <input id="textInput" type="text" name="itemname">
+                    <p><button id="submitText">Analyze</button></p>
+                </div>
+                <div class="photo"> <!--Contains the photo input method-->
+                    <h1>Take a photo</h1>
+                    <p>Please take a photo of the item you would like to dispose.</p> 
+                    <video id="video" autoplay playsinline></video>
+                    <div class="photo-controls">
+                        <button id="startCamera" type="button">Start Camera</button>
+                        <button id="capture" type="button">Capture</button>
+                        <button id="stopCamera" type="button">Stop</button>
+                    </div>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <img id="photoPreview" style="display:none;" alt="Photo Preview">
+                    <label for="photoInput">Photo Preview</label>
+                    <input type="image" id="photoInput" name="photo" style="display:none;">
+                    <p><button id="submitPhoto">Analyze</button></p>
+                </div>
+                <div class="file-overlay"> <!--Contains the file input method-->
+                    <h1>Upload Photo</h1>
+                    <p>Please upload a photo of the item you would like to dispose.</p>
+                    <input type="file" id="imageInput" accept="image/*">
+                    <p><button id="submitButton">Analyze</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
