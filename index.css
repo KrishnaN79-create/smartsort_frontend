@@ -171,3 +171,9 @@ h1 {
     color: #FFFCFB;
         font-family: 'Roboto', sans-serif;
 }
+@media (max-width: 768px) {
+    .input-section {
+        display: grid;
+        grid-template-columns: 275px 275px;
+    }
+}
