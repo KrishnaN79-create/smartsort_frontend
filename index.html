@@ -44,6 +44,24 @@
             captureBtn.disabled = true;
             stopBtn.disabled = true;
         }
+
+        function fileToGenerativePart(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64Data = reader.result.split(",")[1];
+                    resolve({
+                        inlineData: {
+                            mimeType: file.type,
+                            data: base64Data,
+                        },
+                    });
+                };
+                reader.onerror = (err) => reject(err);
+                reader.readAsDataURL(file);
+            });
+        }
+
         // Function to capture the photo and display it in the photo preview element
         function capturePhoto() {
             const w = video.videoWidth;
@@ -62,23 +80,7 @@
         stopBtn && stopBtn.addEventListener('click', stopCamera); // When clicked, it will stop the camera
         captureBtn && captureBtn.addEventListener('click', capturePhoto); // When clicked, it will capture a photo
 
-        // Function to convert the file to a generative part as it is a requirement forr the API
-        function fileToGenerativePart(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const base64Data = reader.result.split(",")[1];
-                    resolve({
-                        inlineData: {
-                            mimeType: file.type,
-                            data: base64Data,
-                         },
-                    });
-                };
-                reader.onerror = (err) => reject(err);
-                reader.readAsDataURL(file);
-            });
-        }
+
         // Generates content using the API based on the text input
         async function generateContent() {
             const imageInput = document.getElementById("textInput");
@@ -93,48 +95,47 @@
             imagePart = document.getElementById("textInput").value;
 
 
-/*            const GEMINI_API_KEY = "AIzaSyAXSuTF-EAz6dGFSWOQzyH4xMWcNULeNXE"
             const url =
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+                "https://smartsort-server.onrender.com/gemini-text";
+
             console.log(imagePart)
-      */      
-     
-      
- const RENDER_URL = "https://smartsort-backend-3llh.onrender.com/gemini";
+            const requestBody = {
+                prompt: `Tell me if this text=${imagePart} represents an object that is recycable, compostable, or trash in one word`,
 
-    const requestBody = {
-        prompt: `Tell me if this image (if provided) or text=${imagePart} represents an object that is recyclable, compostable, or trash in one word`
-    };
+            };
+            // This fetches the API the request that has been given
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+                // This checks whether the response is ok or not and if not, it will throw an error with its details
+                if (!response.ok) {
+                    const errorDetail = await response.json().catch(() => ({}))
+                    throw new Error(
+                        `HTTP error! Status: ${response.Status
+                        }. Details: ${JSON.stringify(errorDetail)}`
+                    );
+                }
 
-    try {
-        const response = await fetch(RENDER_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(requestBody)
-        });
+                const data = await response.json(); //This creates the response into JSON format
+                console.log(data); // Shows the data in the console
+                const text = data.candidates[0].content.parts[0].text; // Receives the text from the response
+                outputElement.innerText = text; // Displays the output on the webpage
+            }
+            // This catches any errors that occur during the process and it also displays the message
+            catch (error) {
+                console.error("Fetch Error:", error.message);
+                outputElement.innerText = `Error: ${error.message}`;
+            }
+            // This re-enables the submit button when completed
+            finally {
+                submitText.disabled = false;
 
-        if (!response.ok) {
-            const errorDetail = await response.json().catch(() => ({}));
-            throw new Error(
-                `HTTP error! Status: ${response.status}. Details: ${JSON.stringify(errorDetail)}`
-            );
-        }
-
-        const data = await response.json();
-        console.log(data);
-
-        const text = data.candidates[0].content.parts[0].text;
-        outputElement.innerText = text;
-
-    } catch (error) {
-        console.error("Fetch Error:", error.message);
-        outputElement.innerText = `Error: ${error.message}`;
-    } finally {
-        submitText.disabled = false;
-    }
-
+            }
         }
         // Generates content using the API based on the file input
         async function generateContentImage() {
@@ -155,28 +156,18 @@
             const imageFile = imageInput.files[0];
             imagePart = await fileToGenerativePart(imageFile);
 
-            const GEMINI_API_KEY = "AIzaSyAXSuTF-EAz6dGFSWOQzyH4xMWcNULeNXE"
             const url =
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+                "https://smartsort-server.onrender.com/gemini-file";
             console.log(imagePart)
             const requestBody = {
-                contents: [
-                    {
-                        parts: [
-                            {
-                                text: `Tell me if this image represents an object that is recycable, compostable, or trash in one word`,
-                            },
-                            imagePart,
-                        ],
-                    },
-                ],
+                prompt: `Tell me if this image represents an object that is recycable, compostable, or trash in one word`,
+                imagePart: imagePart
             };
             // This gives the API the request that is given
             try {
                 const response = await fetch(url, {
                     method: "POST",
                     headers: {
-                        "x-goog-api-key": GEMINI_API_KEY,
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(requestBody),
@@ -194,12 +185,12 @@
                 console.log(data); // This displays the data in the console
                 const text = data.candidates[0].content.parts[0].text // This recieves the text from the response
                 outputElement.innerText = text; // This displays the text(output) on the webpage
-            } 
+            }
             // This finds whether there were any errors during the process and tell the user the message
             catch (error) {
                 console.error("Fetch Error:", error.message);
                 outputElement.innerText = `Error: ${error.message}`;
-            } 
+            }
             // This re-enables the submit button when finished
             finally {
                 submitButton.disabled = false;
@@ -221,33 +212,23 @@
 
             photoPart = photoInput.src
 
-            const GEMINI_API_KEY = "AIzaSyAXSuTF-EAz6dGFSWOQzyH4xMWcNULeNXE"
             const url =
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+                "https://smartsort-server.onrender.com/gemini-image";
 
             const requestBody = {
-                contents: [
-                    {
-                        parts: [
-                            {
-                                text: `Tell me if this photo represents an object that is recycable, compostable, or trash in one word`,
-                            },
-                            {
-                                inlineData: {
-                                    mimeType: "image/png",
-                                    data: photoPart.split(",")[1],
-                                },
-                            },
-                        ],
-                    },
-                ],
+                prompt: `Tell me if this photo represents an object that is recycable, compostable, or trash in one word`,
+                inlineData: {
+                    mimeType: "image/png",
+                    data: photoPart.split(",")[1],
+                },
             };
+
+
             // This gives the API the request that has been given
             try {
                 const response = await fetch(url, {
                     method: "POST",
                     headers: {
-                        "x-goog-api-key": GEMINI_API_KEY,
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(requestBody),
@@ -258,12 +239,12 @@
                 console.log(data);
                 const text = data.candidates[0].content.parts[0].text
                 outputElement.innerText = text;
-            } 
+            }
             // Find whether there wre any errors and display the message to the user
             catch (error) {
                 console.error("Fetch Error:", error.message);
                 outputElement.innerText = `Error: ${error.message}`;
-            } 
+            }
             // Re-enables the submit button when completed
             finally {
                 submitPhoto.disabled = false;
@@ -284,7 +265,8 @@
             </section>
 
             <section class="recycle"> <!--Contains information about recycle category-->
-                <img src="https://media.silhouettedesignstore.com/media/catalog/product/cache/07724bc829ac4d331e977e053f440786/c/u/cute_recycle_heart_colored.png">
+                <img
+                    src="https://media.silhouettedesignstore.com/media/catalog/product/cache/07724bc829ac4d331e977e053f440786/c/u/cute_recycle_heart_colored.png">
                 <h2>Recycle</h2>
                 <p>For materials like paper, plastic, glass, and metal.</p>
             </section>
@@ -298,7 +280,8 @@
         <div class="main"> <!--Contains the main interactive section of the website-->
             <h1 class="title">Smart Sort</h1>
             <p>Please type, take a photo, or upload a file of the item you are willing to throw away.</p>
-            <p>Once you enter the item, this website will figure out whether this item is trash, recycle, or compost.</p>
+            <p>Once you enter the item, this website will figure out whether this item is trash, recycle, or compost.
+            </p>
             <h1 id="output" class="output">Please type, take a photo, or upload an image to get the result.</h1>
             <div class="input-section"> <!--Contains the input methods for the user to provide data to be analyzed-->
                 <div class="text overlay"> <!--Contains the text input method-->
@@ -309,7 +292,7 @@
                 </div>
                 <div class="photo"> <!--Contains the photo input method-->
                     <h1>Take a photo</h1>
-                    <p>Please take a photo of the item you would like to dispose.</p> 
+                    <p>Please take a photo of the item you would like to dispose.</p>
                     <video id="video" autoplay playsinline></video>
                     <div class="photo-controls">
                         <button id="startCamera" type="button">Start Camera</button>
@@ -333,4 +316,5 @@
     </div>
 
 </body>
+
 </html>
