@@ -11,6 +11,7 @@
 <body class="Smart Sort">
 
     <script type="module">
+
         const startBtn = document.getElementById('startCamera'); // Element for start camera button
         const stopBtn = document.getElementById('stopCamera'); // Element for stop camera button
         const captureBtn = document.getElementById('capture'); // Element for capture photo button  
@@ -253,7 +254,6 @@
         submitPhoto.addEventListener("click", generateContentPhoto); // When clicked, it will generate content based on the photo input
         submitText.addEventListener("click", generateContent); // When clicked, it will generate content based on the text input
         submitButton.addEventListener("click", generateContentImage); // When clicked, it will generate content based on the file input
-
     </script>
     <div class="mainWebsite"> <!--Contains the main content of the website-->
         <div class="sidebar"> <!--Contains information about waste categories-->
@@ -281,41 +281,72 @@
             <h1 class="title">Smart Sort</h1>
             <h2>By: Krishna Natarajan</h2>
             <p>Please type, take a photo, or upload a file of the item you are willing to throw away.</p>
-            <p>Once you enter the item, this website will figure out whether this item is trash, recycle, or compost.
-            </p>
+            <p>To do this, click on the input method you would like to use.</p>
+            <p>Once you enter the item, this website will figure out whether this item is trash, recycling, or compost.</p>
+            <p>After you have used one of the input options, you can click the button again, and you can move on to another input option.</p>
+            <p>Let's work together to keep our environment clean!</p>
             <h1 id="output" class="output">Please type, take a photo, or upload an image to get the result.</h1>
             <div class="input-section"> <!--Contains the input methods for the user to provide data to be analyzed-->
-                <div class="text overlay"> <!--Contains the text input method-->
-                    <h1>Please Type</h1>
-                    <p>Please type in the item you would like to dispose.</p>
-                    <input id="textInput" type="text" name="itemname">
-                    <p><button id="submitText">Analyze</button></p>
-                </div>
-                <div class="photo"> <!--Contains the photo input method-->
-                    <h1>Take a photo</h1>
-                    <p>Please take a photo of the item you would like to dispose.</p>
-                    <video id="video" autoplay playsinline></video>
-                    <div class="photo-controls">
-                        <button id="startCamera" type="button">Start Camera</button>
-                        <button id="capture" type="button">Capture</button>
-                        <button id="stopCamera" type="button">Stop</button>
+                <button onclick="text_reveal()">Text Input</button>
+                    <div class="text" id="text-overlay" style="display:none;"> <!--Contains the text input method-->
+                        <h1>Please Type</h1>
+                        <p>Please type in the item you would like to dispose.</p>
+                        <input id="textInput" type="text" name="itemname">
+                        <p><button id="submitText">Analyze</button></p>
                     </div>
-                    <canvas id="canvas" style="display:none;"></canvas>
-                    <img id="photoPreview" style="display:none;" alt="Photo Preview">
-                    <label for="photoInput">Photo Preview</label>
-                    <input type="image" id="photoInput" name="photo" style="display:none;">
-                    <p><button id="submitPhoto">Analyze</button></p>
-                </div>
-                <div class="file-overlay"> <!--Contains the file input method-->
-                    <h1>Upload Photo</h1>
-                    <p>Please upload a photo of the item you would like to dispose.</p>
-                    <input type="file" id="imageInput" accept="image/*">
-                    <p><button id="submitButton">Analyze</button></p>
-                </div>
+                <button onclick="photo_reveal()">Photo Input</button>
+                    <div class="photo" id="photo-overlay" style="display:none;"> <!--Contains the photo input method-->
+                        <h1>Take a photo</h1>
+                        <p>Please take a photo of the item you would like to dispose.</p>
+                        <video id="video" autoplay playsinline></video>
+                        <div class="photo-controls">
+                            <button id="startCamera" type="button">Start Camera</button>
+                            <button id="capture" type="button">Capture</button>
+                            <button id="stopCamera" type="button">Stop</button>
+                        </div>
+                        <canvas id="canvas" style="display:none;"></canvas>
+                        <img id="photoPreview" style="display:none;" alt="Photo Preview">
+                        <label for="photoInput">Photo Preview</label>
+                        <input type="image" id="photoInput" name="photo" style="display:none;">
+                        <p><button id="submitPhoto">Analyze</button></p>
+                    </div>
+                <button onclick="file_reveal()">File Input</button>
+                    <div class="file" id="file-overlay" style="display:none;"> <!--Contains the file input method-->
+                        <h1>Upload Photo</h1>
+                        <p>Please upload a photo of the item you would like to dispose.</p>
+                        <input type="file" id="imageInput" accept="image/*">
+                        <p><button id="submitButton">Analyze</button></p>
+                    </div>
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
+<script>
+    function text_reveal() {
+        var x = document.getElementById("text-overlay");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+    function photo_reveal() {
+        var x = document.getElementById("photo-overlay");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+    function file_reveal() {
+        var x = document.getElementById("file-overlay");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+    
+</script>
