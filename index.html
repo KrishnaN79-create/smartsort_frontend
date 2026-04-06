@@ -283,7 +283,6 @@
             <p>Please type, take a photo, or upload a file of the item you are willing to throw away.</p>
             <p>To do this, click on the input method you would like to use.</p>
             <p>Once you enter the item, this website will figure out whether this item is trash, recycling, or compost.</p>
-            <p>After you have used one of the input options, you can click the button again, and you can move on to another input option.</p>
             <p>Let's work together to keep our environment clean!</p>
             <h1 id="output" class="output">Please type, take a photo, or upload an image to get the result.</h1>
             <div class="input-section"> <!--Contains the input methods for the user to provide data to be analyzed-->
@@ -323,30 +322,3 @@
 </body>
 
 </html>
-<script>
-    text_reveal().disabled = false;
-    function text_reveal() {
-        var x = document.getElementById("text-overlay");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-        } else {
-            x.style.display = "none";
-        }
-    }
-    function photo_reveal() {
-        var x = document.getElementById("photo-overlay");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-        } else {
-            x.style.display = "none";
-        }
-    }
-    function file_reveal() {
-        var x = document.getElementById("file-overlay");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-        } else {
-            x.style.display = "none";
-        }
-    }
-</script>
