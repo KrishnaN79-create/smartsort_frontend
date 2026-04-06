@@ -285,14 +285,12 @@
             <p>Let's work together to keep our environment clean!</p>
             <h1 id="output" class="output">Please type, take a photo, or upload an image to get the result.</h1>
             <div class="input-section"> <!--Contains the input methods for the user to provide data to be analyzed-->
-                <button onclick="text_reveal()">Text Input</button>
                     <div class="text" id="text-overlay"> <!--Contains the text input method-->
                         <h1>Please Type</h1>
                         <p>Please type in the item you would like to dispose.</p>
                         <input id="textInput" type="text" name="itemname">
                         <p><button id="submitText">Analyze</button></p>
                     </div>
-                <button onclick="photo_reveal()">Photo Input</button>
                     <div class="photo" id="photo-overlay"> <!--Contains the photo input method-->
                         <h1>Take a photo</h1>
                         <p>Please take a photo of the item you would like to dispose.</p>
@@ -308,7 +306,6 @@
                         <input type="image" id="photoInput" name="photo" style="display:none;">
                         <p><button id="submitPhoto">Analyze</button></p>
                     </div>
-                <button onclick="file_reveal()">File Input</button>
                     <div class="file" id="file-overlay"> <!--Contains the file input method-->
                         <h1>Upload Photo</h1>
                         <p>Please upload a photo of the item you would like to dispose.</p>
